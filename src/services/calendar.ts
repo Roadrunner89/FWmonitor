@@ -1,11 +1,12 @@
 'use strict';
 
-import ical from 'node-ical';
-import * as CalendarModel from '../models/calendar';
 import * as CalendarGroupsModel from '../models/calendarGroup';
-import globalEvents from '../utils/globalEvents';
-import logging from '../utils/logging';
+import * as CalendarModel from '../models/calendar';
+
 import config from '../utils/config';
+import globalEvents from '../utils/globalEvents';
+import ical from 'node-ical';
+import logging from '../utils/logging';
 
 const NAMESPACE = 'Calendar_Service';
 
@@ -93,6 +94,12 @@ class CalendarService {
         return calendarElements;
     }
 
+    /**
+     * Lädt den ICAL Kalender herunter
+     * @param onlyFuture gib nur zukünftige Einträge zurück
+     * @param calendarGroups Kalendergruppen
+     * @returns CalendarElement Array oder undefined
+     */
     private async get_ical(
         onlyFuture: boolean = true,
         calendarGroups: CalendarGroupsModel.CalendarGroupRow[]
@@ -128,6 +135,29 @@ class CalendarService {
                     });
                 }
 
+                let remind = undefined;
+
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                Object.entries(entry).forEach(([key, value]) => {
+                    if (value.type != undefined && value.type == 'VALARM') {
+                        const trig = value.trigger;
+                        const days = parseInt(
+                            trig.substring(trig.indexOf('P') + 1, trig.indexOf('D')) || 0
+                        );
+                        let hours =
+                            parseInt(trig.substring(trig.indexOf('T') + 1, trig.indexOf('H'))) || 0;
+                        const minutes =
+                            parseInt(trig.substring(trig.indexOf('H') + 1, trig.indexOf('M'))) || 0;
+                        //console.log(`d ${days}, h ${hours}, m ${minutes}`);
+                        hours = hours + days * 24;
+                        //console.log(` --> h ${hours}, m ${minutes}`);
+
+                        remind = new Date(String(entry.start));
+                        remind.setHours(remind.getHours() - hours);
+                        remind.setMinutes(remind.getMinutes() - minutes);
+                    }
+                });
+
                 // Termin speichern
                 const calendarElement: CalendarElement = {
                     id: -1,
@@ -135,7 +165,7 @@ class CalendarService {
                     start: new Date(String(entry.start)),
                     end: new Date(String(entry.end)),
                     location: String(entry.location),
-                    remind: undefined,
+                    remind: remind,
                     group: group
                 };
 
@@ -148,6 +178,11 @@ class CalendarService {
         }
     }
 
+    /**
+     * Gibt einen Kalendereintrag zurück
+     * @param id Eintrag ID
+     * @returns Kelenderelement
+     */
     public async find_id(id: number): Promise<CalendarElement[]> {
         const calendarGroups = await CalendarGroupsModel.model.find();
         const dbElements = await CalendarModel.model.find({ id: id });
@@ -157,6 +192,10 @@ class CalendarService {
         return calendarElements;
     }
 
+    /**
+     * Gibt alle Kalendereinträge zurück (ICAL + Datenbank)
+     * @returns Kalenderelement Array
+     */
     public async find_all(): Promise<CalendarElement[]> {
         const calendarGroups = await CalendarGroupsModel.model.find();
         const dbElements = await CalendarModel.model.find({}, undefined, undefined);
@@ -173,24 +212,30 @@ class CalendarService {
         return calendarElements;
     }
 
+    /**
+     * Gibt alle zukünftigen Kalendereinträge zurück (ICAL + Datenbank)
+     * @returns Kalenderelement Array
+     */
     public async find_all_upcoming(): Promise<CalendarElement[] | undefined> {
         const now = new Date();
         const calendarGroups = await CalendarGroupsModel.model.find();
         const dbElements = await CalendarModel.model.find({ 'start>=': now.toISOString() });
-        if (dbElements.length < 1) return;
+        const icalElements = await this.get_ical(true, calendarGroups);
 
+        if (dbElements.length < 1 && (!icalElements || icalElements?.length < 1)) return;
         const calendarElements = this.createCalendarElementsFromRows(dbElements, calendarGroups);
 
-        const calendarElements2 = await this.get_ical(true, calendarGroups);
-        if (calendarElements2) {
-            for (let i = 0; i < calendarElements2.length; i++)
-                calendarElements.push(calendarElements2[i]);
+        if (icalElements) {
+            for (let i = 0; i < icalElements.length; i++) calendarElements.push(icalElements[i]);
             calendarElements.sort(this.sortByDate);
         }
 
         return calendarElements;
     }
 
+    /**
+     * Erstellte einen neuen Kalendereintrag
+     */
     public async create(
         summary: string,
         start: Date,
@@ -212,6 +257,9 @@ class CalendarService {
         globalEvents.emit('calendar-change');
     }
 
+    /**
+     * Löscht einen Kalendereintrag
+     */
     public async delete(id: number) {
         logging.debug(NAMESPACE, 'delete', id);
 
@@ -228,6 +276,9 @@ class CalendarService {
         globalEvents.emit('calendar-change');
     }
 
+    /**
+     * Ändert einen Kalendereintrag
+     */
     public async update(id: number, summary: string, start: Date, remind: Date, group: string) {
         logging.debug(NAMESPACE, 'update', { id, summary, start, remind, group });
 
@@ -249,10 +300,13 @@ class CalendarService {
         globalEvents.emit('calendar-change');
     }
 
-    public init() {
+    /**
+     * Terminüberwachung aktivieren
+     */
+    public async init() {
         let lastTime = new Date();
 
-        setInterval(async () => {
+        const check = async () => {
             logging.debug(NAMESPACE, 'Terminerinnerung CHECK...');
 
             const termine = await this.find_all_upcoming();
@@ -268,6 +322,13 @@ class CalendarService {
 
                     const timeRemind = new Date(termin.remind).getTime();
 
+                    /*console.log(
+                        new Date(timeRemind).toLocaleDateString() +
+                            ' ' +
+                            new Date(timeRemind).toTimeString(),
+                        termin
+                    );*/
+
                     if (lastTime.getTime() < timeRemind && timeRemind < date_now.getTime()) {
                         logging.debug(NAMESPACE, 'Terminerinnerung: ', termin);
                         globalEvents.emit('calendar-remind', termin);
@@ -275,7 +336,12 @@ class CalendarService {
                 }
             }
             lastTime = date_now;
+        };
+
+        setInterval(async () => {
+            check();
         }, 60000);
+        check();
     }
 }
 

@@ -156,7 +156,19 @@ const SCREEN = {
     screen_time_diashow: Number(process.env.DIASHOW_DELAY) || 15000,
     screen_imagedate_diashow: process.env.DIASHOW_SHOW_IMAGEDATE
         ? /true/i.test(process.env.DIASHOW_SHOW_IMAGEDATE)
-        : false
+        : false,
+    screen_filedate_diashow: process.env.DIASHOW_SHOW_FILEDATE
+        ? !/false/i.test(process.env.DIASHOW_SHOW_FILEDATE)
+        : true
+};
+
+const MAP = {
+    layer1_url: process.env.MAP_LAYER1_URL || 'https://{a-c}.tile.openstreetmap.de/{z}/{x}/{y}.png',
+    layer1_attr: process.env.MAP_LAYER1_ATTR || '© openstreetmap',
+    layer1_hillshade_url: process.env.MAP_LAYER1_HILLSHADING_URL,
+    layer1_hillshade_attr: process.env.MAP_LAYER1_HILLSHADING_ATTR,
+    layer2_url: process.env.MAP_LAYER2_URL || 'https://{a-c}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    layer2_attr: process.env.MAP_LAYER2_ATTR || '© OpenTopoMap'
 };
 
 const GEOCODE = {
@@ -254,12 +266,12 @@ const LOG = {
 };
 
 const UPDATE = {
-    updateCheck: process.env.UPDATE_CHECK ? /false/i.test(process.env.UPDATE_CHECK) : true
+    updateCheck: process.env.UPDATE_CHECK ? !/false/i.test(process.env.UPDATE_CHECK) : true
     //autoupdate: false
 };
 
 const config = {
-    version: '3.1.1',
+    version: '3.2.1',
     version_new: '---',
     raspiversion: process.env.RASPIVERSION ? /true/i.test(process.env.RASPIVERSION) : false,
     sqlite: SQLITE,
@@ -282,7 +294,8 @@ const config = {
     rateLimit: RATE_LIMITS,
     email: EMAIL,
     update: UPDATE,
-    timezone: 'de-DE'
+    timezone: 'de-DE',
+    map: MAP
 };
 
 export default config;

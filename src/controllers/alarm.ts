@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { checkValidation } from './controller';
 import { AlarmRow } from '../models/alarm';
 import userService from '../services/user';
-import groupService from '../services/group';
+import usergroupService from '../services/userGroup';
 import AlarmService from '../services/alarm';
 import { instance as DeviceServiceInstance } from '../services/device';
 import HttpException from '../utils/httpException';
@@ -27,7 +27,7 @@ class AlarmController {
             throw new HttpException(HttpStatusCodes.NOT_FOUND, 'User not found');
         }
 
-        const group = await groupService.find_by_id(user[0].group);
+        const group = await usergroupService.find_by_id(user[0].group);
         if (!group || group.length < 1) {
             throw new HttpException(HttpStatusCodes.NOT_FOUND, 'Group not found');
         }
@@ -276,6 +276,9 @@ class AlarmController {
         res.send('OK');
     }
 
+    /**
+     *  Strassen Polyline
+     */
     public async get_streetCache(req: Request, res: Response) {
         logging.debug(NAMESPACE, 'get_streetCache');
 
@@ -284,6 +287,9 @@ class AlarmController {
         res.send(response);
     }
 
+    /**
+     * Route
+     */
     public async get_route(req: Request, res: Response) {
         logging.debug(NAMESPACE, 'get_route');
 
