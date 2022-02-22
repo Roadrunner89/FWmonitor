@@ -30,3 +30,5 @@ temp/**/*
 .ionide
 
 log.txt
+package-lock.json
+start.sh
