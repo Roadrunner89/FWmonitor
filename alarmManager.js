@@ -53,8 +53,9 @@ module.exports = function () {
 			fields.parseData(data);
 
 			// Geocoding
+			//ASt: Angepasst auf Niedersachsen -> für nächste Version evtl in .env verlagern
 			var geoData = await geocodeManager.geocode(
-				'Germany, Bayern, ' + fields.ORT + ", " + fields.ORTSTEIL + ", " + fields.STRASSE, (/\d/.test(fields.STRASSE) ? true : false), fields.OBJEKT, fields.ORT
+				'Germany, Niedersachsen, ' + fields.ORT + ", " + fields.ORTSTEIL + ", " + fields.STRASSE, (/\d/.test(fields.STRASSE) ? true : false), fields.OBJEKT, fields.ORT
 			);
 
 			// Daten in Datenbank schreiben

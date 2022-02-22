@@ -7,3 +7,4 @@ temp/
 .env
 Hydrantenpositionen.txt
 node_modules
+start.sh

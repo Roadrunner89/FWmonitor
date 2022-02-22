@@ -1,10 +1,9 @@
-﻿# FWMonitor
+# FWMonitor
 
 Diese Software kann bei Feuerwehren dazu verwendet werden, die Informationen des Alarmfax auf einem Bildschirm darzustellen. 
 Insbesondere werden die Informationen so aufbereitet, dass der Einsatzort auf einer Karte visualisiert wird.
 
-Die Faxauswertung ist derzeit auf die ILS Rosenheim abgestimmt (kann aber am Anfang der alarmFax.js Datei angepasst werden).
-E-Mail Empfang ist zum Test verfügbar. Funktion nicht garantiert.
+Diese Software wurde für den Einsatz im Heidekreis angepasst und der Telegrambot wurde deaktiviert
 
 ## Funktionsumfang
 
@@ -278,6 +277,7 @@ Bei Fragen oder Anregungen einfach in GitHub oben unter Issues ein Issue erstell
 ## Authors
 
 *  *Johannes Resch - Freiwillige Feuerwehr Fischbachau*
+*  *Alexander Stark - Anpassungen für die Nutzung im Heidekreis*
 
 
 ## License
@@ -296,4 +296,4 @@ Ich übernehme keine Haftung für die Funktion der Software vor Ort. Da über di
 ![Bild](/Screenshot2.PNG "Bild")
 ![Bild](/Screenshot3.PNG "Bild")
 ![Bild](/Screenshot4.PNG "Bild")
-![Bild]("/Auto Bildschirm/pic.png" "Bild")
+![Bild](/Auto Bildschirm/pic.png "Bild")

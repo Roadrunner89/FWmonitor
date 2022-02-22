@@ -1,6 +1,6 @@
 #!/bin/sh
-#cd /home/pi/Desktop/FWMonitor
+cd /home/alex/FWmonitor
 while true
 do
-  sudo nodejs app
+  sudo node app
 done

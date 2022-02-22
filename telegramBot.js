@@ -1620,7 +1620,8 @@ _${st_nichtverf}_`,
 
 
 	// ---------------- Starte Bot ----------------	
-	bot.launch()
+	//ASt: Antwortfunktion des Bot deaktiviert -> evtl in nächster Version in env abschaltbar machen
+	//bot.launch()
 
 	// Enable graceful stop
 	process.once('SIGINT', () => bot.stop('SIGINT'))

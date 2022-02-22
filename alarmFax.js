@@ -17,41 +17,41 @@ function searchElement(start, end, data) {
 // ---------------- Fax Suchworte (RegEx) ----------------
 // Filtert Teil aus dem Fax zwischen Filter Beginn und Filter Ende (\n ist neue Zeile)
 exports.EINSATZSTICHWORT = "-/-"; 				// Variable
-exports.s_EINSATZSTICHWORT = "Stichwort : ";	// Filter Beginn
+exports.s_EINSATZSTICHWORT = "Stichwort ";	// Filter Beginn
 exports.e_EINSATZSTICHWORT = "\n";				// Filter Ende
 
 exports.SCHLAGWORT = "-/-";						// Variable
-exports.s_SCHLAGWORT = "Schlagw. : ";			// Filter Beginn
+exports.s_SCHLAGWORT = "Meldebild ";			// Filter Beginn
 exports.e_SCHLAGWORT = "\n";					// Filter Ende
 
 exports.OBJEKT = "-/-";							// Variable
-exports.s_OBJEKT = "Objekt : ";					// Filter Beginn
+exports.s_OBJEKT = "Objekt ";					// Filter Beginn
 exports.e_OBJEKT = "\n";						// Filter Ende
 
 exports.BEMERKUNG = "-/-";						// Variable
-exports.s_BEMERKUNG = "BEMERKUNG";				// Filter Beginn
-exports.e_BEMERKUNG = "EINSATZHINWEIS";			// Filter Ende
+exports.s_BEMERKUNG = "Bemerkung ";				// Filter Beginn
+exports.e_BEMERKUNG = "\n";			// Filter Ende
 
 exports.STRASSE = "-/-";						// Variable
-exports.s_STRASSE = "Straße : ";				// Filter Beginn
+exports.s_STRASSE = "Straße ";				// Filter Beginn
 exports.e_STRASSE = "\n";						// Filter Ende
 
 exports.ORTSTEIL = "-/-";						// Variable
-exports.s_ORTSTEIL = "Ortsteil : ";				// Filter Beginn
+exports.s_ORTSTEIL = "leer ";				// Filter Beginn
 exports.e_ORTSTEIL = "\n";						// Filter Ende
 
 exports.ORT = "-/-";							// Variable
-exports.s_ORT = "Gemeinde : ";					// Filter Beginn
+exports.s_ORT = "Ort ";					// Filter Beginn
 exports.e_ORT = "\n";							// Filter Ende
 
 exports.EINSATZMITTEL = "";						// Variable
-exports.s_EINSATZMITTEL = "EINSATZMITTEL";		// Filter Beginn
-exports.e_EINSATZMITTEL = "BEMERKUNG";			// Filter Ende
+exports.s_EINSATZMITTEL = "EM-Anforderung ";		// Filter Beginn
+exports.e_EINSATZMITTEL = "\n";			// Filter Ende
 
 exports.cars1 = [];								// Variable Fahrzeuge eigen
 exports.cars2 = [];								// Variable Fahrzeuge andere
-exports.s_CAR = "Name : ";						// Filter Beginn
-exports.e_CAR = "\n";							// Filter Ende
+exports.s_CAR = "HK 18-";						// Filter Beginn
+exports.e_CAR = "  ";							// Filter Ende
 exports.CAR1 = process.env.FW_NAME;				// Filter um als eigenes Fahrzeug erkannt zu weden (aus .env)
 
 
@@ -101,11 +101,12 @@ exports.parseData = function(data) {
     this.EINSATZSTICHWORT = searchElement(this.s_EINSATZSTICHWORT, this.e_EINSATZSTICHWORT, data);
     if(this.EINSATZSTICHWORT == null) this.EINSATZSTICHWORT = "";
     
+    //ASt: Schlagwortsuche entfernt
     this.SCHLAGWORT = searchElement(this.s_SCHLAGWORT, this.e_SCHLAGWORT, data);
     if(this.SCHLAGWORT == null) this.SCHLAGWORT = "";
-    this.SCHLAGWORT = this.SCHLAGWORT.replace('#', ' ');
-    this.SCHLAGWORT = this.SCHLAGWORT.substr(this.SCHLAGWORT.search('#'));
-    this.SCHLAGWORT = this.SCHLAGWORT.replace(/#/g, ' ');
+    //this.SCHLAGWORT = this.SCHLAGWORT.replace('#', ' ');
+    //this.SCHLAGWORT = this.SCHLAGWORT.substr(this.SCHLAGWORT.search('#'));
+    //this.SCHLAGWORT = this.SCHLAGWORT.replace(/#/g, ' ');
     
     this.OBJEKT = searchElement(this.s_OBJEKT, this.e_OBJEKT, data);
     if(this.OBJEKT == null) this.OBJEKT = "";

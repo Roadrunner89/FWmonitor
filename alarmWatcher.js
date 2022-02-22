@@ -68,8 +68,11 @@ module.exports = function (_alarmManager) {
         console.log("PDF -> TIFF    FERTIG\n")
     }
 
+    //Damit Faxe des Heidekreis korrekt verarbeitet werden, muss Tesseract mit "--psm 6" aufgerufen werden
+    // -Assume a single uniform block of text.
+    
     async function tiffToTxt(file, targetPath) {
-        await execShellCommand(`"${process.env.TESSERACT_PATH}" "${file}" "${targetPath}" -l deu`);
+        await execShellCommand(`"${process.env.TESSERACT_PATH}" "${file}" "${targetPath}" -l deu --psm 6`);
         console.log("TIFF -> TXT    FERTIG\n")
     }
 
