@@ -27,7 +27,29 @@ const SERVER_HTTPS = {
     port: process.env.SERVER_SSL_PORT || 443,
     key: process.env.SSL_KEY,
     cert: process.env.SSL_CERT,
+    ca: process.env.SSL_CA,
     cors: process.env.CORS
+};
+
+const MQTT_BROKER = {
+    internalBroker: process.env.MQTT_INTERNAL_BROKER
+        ? !/false/i.test(process.env.MQTT_INTERNAL_BROKER)
+        : true,
+    hostname: process.env.MQTT_SERVER_SSL_HOSTNAME || '127.0.0.1',
+    port: process.env.MQTT_BROKER_PORT || 8883,
+    key: process.env.MQTT_SSL_KEY,
+    cert: process.env.MQTT_SSL_CERT,
+    ca: process.env.MQTT_SSL_CA,
+    user: process.env.MQTT_USER,
+    password: process.env.MQTT_PASSWORD,
+    internalUser: '',
+    internalPassword: '',
+    logToFile: process.env.MQTT_LOG_TO_FILE ? /true/i.test(process.env.MQTT_LOG_TO_FILE) : false,
+    topic_fe2_status: process.env.MQTT_TOPIC_FE2_STATUS,
+    topic_fe2_alarm: process.env.MQTT_TOPIC_FE2_ALARM,
+    topic_fe2_lebenszeichen: process.env.MQTT_TOPIC_FE2_LEBENSZEICHEN,
+    topic_fe2_lebenszeichen_startdelay:
+        Number(process.env.MQTT_TOPIC_FE2_LEBENSZEICHEN_STARTDELAY) || 65
 };
 
 const APP = {
@@ -186,6 +208,8 @@ const GEOCODE = {
 };
 
 const ALARMFIELDS = {
+    s_EINSATZNUMMER: process.env.ALARMFIELDS_EINSATZNUMMER_S || 'satz-Nr.:', // Filter Beginn
+    e_EINSATZNUMMER: process.env.ALARMFIELDS_EINSATZNUMMER_E || '\n', // Filter Ende
     s_EINSATZSTICHWORT: process.env.ALARMFIELDS_EINSATZSICHWORT_S || 'Stichwort :', // Filter Beginn
     e_EINSATZSTICHWORT: process.env.ALARMFIELDS_EINSATZSICHWORT_E || '\n', // Filter Ende
     s_SCHLAGWORT: process.env.ALARMFIELDS_SCHLAGWORT_S || 'Schlagw. :', // Filter Beginn
@@ -252,7 +276,7 @@ const RATE_LIMITS = {
 };
 
 const LOG = {
-    pad_namespace: 25,
+    pad_namespace: 1,
     loglevel:
         LOGLEVEL.ERROR |
         LOGLEVEL.INFO |
@@ -271,12 +295,13 @@ const UPDATE = {
 };
 
 const config = {
-    version: '3.2.1',
+    version: '3.3.2',
     version_new: '---',
     raspiversion: process.env.RASPIVERSION ? /true/i.test(process.env.RASPIVERSION) : false,
     sqlite: SQLITE,
     server_http: SERVER_HTTP,
     server_https: SERVER_HTTPS,
+    mqtt_broker: MQTT_BROKER,
     telegram: TELEGRAM,
     app: APP,
     folders: FOLDERS,

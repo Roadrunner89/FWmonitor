@@ -94,6 +94,11 @@ export const updateUser = [
         .withMessage('praes is required')
         .isBoolean()
         .withMessage('praes must be boolean'),
+    body('car_list')
+        .exists()
+        .withMessage('car_list is required')
+        .isBoolean()
+        .withMessage('car_list must be boolean'),
     body('name').isString().withMessage('name must be string'),
     body('vorname').isString().withMessage('vorname must be string')
 ];
@@ -105,6 +110,20 @@ export const updateNotificationsApp = [
         .isNumeric()
         .withMessage('value is must be numeric'),
     body('subscription').exists().withMessage('subscription is required')
+];
+export const deleteNotificationsApp = [
+    body('subid')
+        .exists()
+        .withMessage('id is required')
+        .isNumeric()
+        .withMessage('id must be numeric')
+];
+export const testNotificationsApp = [
+    body('subid')
+        .exists()
+        .withMessage('id is required')
+        .isNumeric()
+        .withMessage('id must be numeric')
 ];
 
 export const updateNotificationsCalendar = [

@@ -3,6 +3,7 @@
 import * as UserModel from '../models/user';
 
 import { addLeadingZero, isJsonString } from '../utils/common';
+import webpushService, { NotificationMessage } from './webpush';
 
 import { UserStatus } from '../models/user';
 import globalEvents from '../utils/globalEvents';
@@ -360,6 +361,60 @@ class UserService {
         }
     }
 
+    public async delete_notifications_app(id: number, subid: number) {
+        const response = await this.get_notifications_app(id);
+
+        if (!response) throw new Error(NAMESPACE + ' delete_notifications_app - User not found');
+
+        let subscription_old = JSON.parse(response.appNotificationsSubscription);
+
+        if (!Array.isArray(subscription_old)) {
+            subscription_old = [];
+        }
+
+        if (subscription_old[subid]) subscription_old.splice(subid, 1);
+
+        const affectedRows = await UserModel.model.update(id, {
+            appNotifications: response.appNotifications,
+            appNotificationsSubscription: JSON.stringify(subscription_old)
+        });
+
+        if (affectedRows < 1) {
+            throw new Error(NAMESPACE + ' delete_notifications_app - No rows changed');
+        }
+    }
+    public async test_notifications_app(id: number, subid: number) {
+        const response = await this.get_notifications_app(id);
+
+        if (!response) throw new Error(NAMESPACE + ' test_notifications_app - User not found');
+
+        let subscription_old = JSON.parse(response.appNotificationsSubscription);
+
+        if (!Array.isArray(subscription_old)) {
+            subscription_old = [];
+        }
+
+        const notAfter = new Date();
+        notAfter.setTime(notAfter.getTime() + 2 * 60 * 1000);
+
+        if (subscription_old[subid]) {
+            const message: NotificationMessage = {
+                alerts: 1,
+                title: 'Notification Test',
+                text: 'Testnachricht',
+                tag: 'Test',
+                silent: false,
+                timestamp: new Date().toISOString(),
+                notAfter: notAfter.toISOString(),
+                actions: []
+            };
+            webpushService.notify(id, [subscription_old[subid]], message);
+            return;
+        }
+
+        throw new Error(NAMESPACE + ' test_notifications_app - Subscription not found');
+    }
+
     // Berechtigungen/Rollen
     public async get_roles(id: number) {
         const result = await this.find({ id: id });
@@ -377,7 +432,8 @@ class UserService {
             softwareInfo: user.softwareInfo,
             telefonliste: user.telefonliste,
             kalender: user.kalender,
-            praes: user.praes
+            praes: user.praes,
+            car_list: user.car_list
         };
     }
 
@@ -401,7 +457,8 @@ class UserService {
                 drucker: user.drucker,
                 softwareInfo: user.softwareInfo,
                 telefonliste: user.telefonliste,
-                kalender: user.kalender
+                kalender: user.kalender,
+                car_list: user.car_list
             });
         }
 
@@ -415,6 +472,16 @@ class UserService {
 
         if (affectedRows < 1) {
             throw new Error(NAMESPACE + ' update_roles_admin - No rows changed');
+        }
+    }
+
+    public async update_roles_carList(id: number, value: boolean) {
+        const affectedRows = await UserModel.model.update(Number(id), {
+            car_list: value
+        });
+
+        if (affectedRows < 1) {
+            throw new Error(NAMESPACE + ' update_roles_carList - No rows changed');
         }
     }
 

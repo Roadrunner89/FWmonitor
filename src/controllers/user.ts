@@ -106,7 +106,10 @@ class UserController {
                 Number(req.params.id),
                 Number(req.body.praes) == 1
             );
-            console.log(req.body.name, req.body.vorname);
+            await UserService.update_roles_carList(
+                Number(req.params.id),
+                Number(req.body.car_list) == 1
+            );
             if (req.body.name) {
                 await UserService.update_name(Number(req.params.id), String(req.body.name));
             }
@@ -148,7 +151,8 @@ class UserController {
             calendar_full: req.session.calendar_full,
             telefone: req.session.telefone,
             praes: req.session.praesentation,
-            name: req.session.name
+            name: req.session.name,
+            car_list: req.session.car_list
         });
     }
 
@@ -327,6 +331,37 @@ class UserController {
                 Number(req.body.value),
                 String(req.body.subscription)
             );
+        } catch (error) {
+            throw new HttpException(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'No rows changed');
+        }
+        res.send('OK');
+    }
+    public async delete_user_notifications_app_id(req: Request, res: Response) {
+        logging.debug(NAMESPACE, 'delete_user_notifications_app_id', {
+            id: req.params.id,
+            subid: req.body.subid
+        });
+        checkValidation(req);
+
+        try {
+            await UserService.delete_notifications_app(
+                Number(req.params.id),
+                Number(req.body.subid)
+            );
+        } catch (error) {
+            throw new HttpException(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'No rows changed');
+        }
+        res.send('OK');
+    }
+    public async test_user_notifications_app_id(req: Request, res: Response) {
+        logging.debug(NAMESPACE, 'test_user_notifications_app_id', {
+            id: req.params.id,
+            subid: req.body.subid
+        });
+        checkValidation(req);
+
+        try {
+            await UserService.test_notifications_app(Number(req.params.id), Number(req.body.subid));
         } catch (error) {
             throw new HttpException(HttpStatusCodes.INTERNAL_SERVER_ERROR, 'No rows changed');
         }
